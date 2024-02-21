@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(Raylib_test)
+project(SimpleLevelEditor)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -16,8 +16,8 @@ set(HEADERS
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
-add_executable(rayTest ${SOURCES} ${HEADERS})
+add_executable(SimpleLevelEditor ${SOURCES} ${HEADERS})
 
-target_include_directories(rayTest PRIVATE include)
+target_include_directories(SimpleLevelEditor PRIVATE include)
 
-target_link_libraries(rayTest ${PROJECT_SOURCE_DIR}/lib/libraylib.a "-framework OpenGL" "-framework OpenAL" "-framework IOKit" "-framework CoreVideo" "-framework Cocoa" "-framework CoreAudio" "-framework AudioToolbox" "-framework CoreMIDI" "-framework CoreFoundation" "-framework QuartzCore" "-framework ForceFeedback" "-framework Carbon" "-framework AppKit" "-framework Metal" "-framework MetalKit" "-framework MetalPerformanceShaders" "-framework AVFoundation" "-framework GameController" "-framework WebKit" "-framework Security" "-framework Foundation" "-framework CoreGraphics" "-framework CoreText" "-framework CoreImage" "-framework ImageIO" "-framework CoreServices" "-framework ApplicationServices" "-framework CoreMedia" "-framework CoreVideo")
+target_link_libraries(SimpleLevelEditor ${PROJECT_SOURCE_DIR}/lib/libraylib.a "-framework OpenGL" "-framework OpenAL" "-framework IOKit" "-framework CoreVideo" "-framework Cocoa" "-framework CoreAudio" "-framework AudioToolbox" "-framework CoreMIDI" "-framework CoreFoundation" "-framework QuartzCore" "-framework ForceFeedback" "-framework Carbon" "-framework AppKit" "-framework Metal" "-framework MetalKit" "-framework MetalPerformanceShaders" "-framework AVFoundation" "-framework GameController" "-framework WebKit" "-framework Security" "-framework Foundation" "-framework CoreGraphics" "-framework CoreText" "-framework CoreImage" "-framework ImageIO" "-framework CoreServices" "-framework ApplicationServices" "-framework CoreMedia" "-framework CoreVideo")
