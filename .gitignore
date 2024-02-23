@@ -2,3 +2,4 @@ bin/
 build/
 lib/*.a
 lib/*.dylib
+.vscode/
