@@ -48,10 +48,10 @@ int main()
     SetTargetFPS(60);
     try
     {
-        sceneManager.createScene("scene1");
-        sceneManager.createScene("scene2");
-        sceneManager.createScene("scene3");
-        sceneManager.SetActiveScene("scene1");
+        sceneManager.createScene("MainRoom");
+        sceneManager.createScene("Stage1");
+        sceneManager.createScene("Castle");
+        sceneManager.SetActiveScene("MainRoom");
         GuiLoadStyle("../styles/dark/style_dark.rgs");
         while (!WindowShouldClose())
         {
