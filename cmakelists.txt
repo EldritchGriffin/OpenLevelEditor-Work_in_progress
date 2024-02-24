@@ -4,20 +4,22 @@ project(SimpleLevelEditor)
 
 set(CMAKE_CXX_STANDARD 11)
 
+
 set(SOURCES
-    src/main.cpp
-    src/scene.cpp
-    src/sceneManager.cpp
+src/main.cpp
+src/scene.cpp
+src/sceneManager.cpp
 )
 
 set(HEADERS
-    include/raylib.h
-    include/raymath.h
-    include/rlgl.h
-    include/scene.hpp
-    include/sceneManager.hpp
-    include/raygui.h
+include/raylib.h
+include/raymath.h
+include/rlgl.h
+include/scene.hpp
+include/sceneManager.hpp
+include/raygui.h
 )
+add_compile_options(-Wno-deprecated-declarations)
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
 
