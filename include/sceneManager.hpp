@@ -14,6 +14,7 @@ public:
     void RemoveScene(const std::string &name);
     void SetActiveScene(const std::string &name);
     std::string getActiveScene();
+    void renameActiveScene(const std::string &name);
     void Update();
     void Draw();
     std::vector<Scene *> getScenes();
