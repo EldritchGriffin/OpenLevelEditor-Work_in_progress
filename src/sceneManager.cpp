@@ -17,6 +17,8 @@ SceneManager::~SceneManager()
 
 void SceneManager::createScene(const std::string &name)
 {
+    if(name.empty())
+        throw std::runtime_error("sceneName must not be empty");
     for (auto scene : scenes)
     {
         if (scene->getName() == name)
@@ -29,17 +31,15 @@ void SceneManager::createScene(const std::string &name)
 }
 
 void SceneManager::RemoveScene(const std::string &name) {
-    for (auto it = scenes.begin(); it != scenes.end(); /* no increment here */) {
+    for (auto it = scenes.begin(); it != scenes.end();) {
         if ((*it)->getName() == name) {
             if (activeScene && activeScene->getName() == name)
                 activeScene = nullptr;
-            
-            delete *it; // Delete the scene object first.
-            it = scenes.erase(it); // Erase returns the iterator to the next element.
-            
-            return; // Exit the function.
+            delete *it;
+            it = scenes.erase(it); 
+            return;
         } else {
-            ++it; // Increment the iterator only if no deletion occurs.
+            ++it;
         }
     }
     throw std::runtime_error("Scene not found");
@@ -69,6 +69,8 @@ std::string SceneManager::getActiveScene()
 
 void SceneManager::renameActiveScene(const std::string &name)
 {
+    if(activeScene == nullptr)
+        throw std::runtime_error("No Selected Scene");
     for(auto scene : scenes)
     {
         if(scene->getName() == name)

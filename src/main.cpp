@@ -13,7 +13,18 @@ static void SaveProjectButton();
 static void RemoveSceneButton(int index, SceneManager & sceneManager, int *activeScene);
 static void CreateSceneButton(char *sceneName, SceneManager &sceneManager);
 static void RenameSceneButton(char *sceneName, SceneManager &sceneManager);
-static void HandleSceneSelect(int *activeScene, SceneManager sceneManager);
+static void HandleSceneSelect(int *activeScene, SceneManager &sceneManager);
+
+std::string styleString(std::string str)
+{
+    if(str.size() >= 25)
+    {
+        str = str.substr(0, 22);
+        str += "...";
+        return (str);
+    }
+    return str;
+}
 
 char* getSceneNames(SceneManager &sceneManager) {
     std::vector<Scene*> scenes = sceneManager.getScenes();
@@ -26,7 +37,7 @@ char* getSceneNames(SceneManager &sceneManager) {
         if (!sceneNames.empty()) {
             sceneNames += ";";
         }
-        sceneNames += scene->getName();
+        sceneNames += styleString(scene->getName());
     }
 
     char* res = new char[sceneNames.size() + 1];
@@ -54,7 +65,8 @@ void drawGui(SceneManager &sceneManager)
     if (GuiButton((Rectangle){ 216, 40, 72, 24 }, "#002#Save")) SaveProjectButton(); //TODO: create logic for saving project
     GuiGroupBox((Rectangle){ 24, 96, 288, 576 }, "Scene Manager");
     GuiListView((Rectangle){ 72, 240, 192, 344 }, sceneList, &sceneListScrollIndex, &sceneListActive);
-    // HandleSceneSelect(&sceneListActive, sceneManager);
+    if(!sceneManager.getScenes().empty())
+        HandleSceneSelect(&sceneListActive, sceneManager);
     GuiLabel((Rectangle){ 72, 216, 120, 24 }, "Scenes:");
     if (GuiButton((Rectangle){ 144, 592, 120, 32 }, "#113#Remove Scene")) RemoveSceneButton(sceneListActive, sceneManager, &sceneListActive); 
     if (GuiTextBox((Rectangle){ 72, 144, 192, 24 }, sceneName, 128, createSceneTextBoxEditMode)) createSceneTextBoxEditMode = !createSceneTextBoxEditMode;
@@ -74,10 +86,6 @@ int main()
     SetTargetFPS(60);
     try
     {
-        sceneManager.createScene("MainRoom");
-        sceneManager.createScene("Stage1");
-        sceneManager.createScene("Castle");
-        sceneManager.SetActiveScene("MainRoom");
         while (!WindowShouldClose())
         {
             sceneManager.Update();
@@ -113,7 +121,8 @@ static void RemoveSceneButton(int index, SceneManager &sceneManager, int *active
     try
     {
         sceneManager.RemoveScene(sceneManager.getScenes().at(index)->getName());
-        // *activeScene -= 1;
+        if(*activeScene != 0)
+            *activeScene -= 1;
     }
     catch(const std::exception& e)
     {
@@ -146,6 +155,13 @@ static void RenameSceneButton(char *sceneName, SceneManager & sceneManager)
     
 }
 
-static void HandleSceneSelect(int *activeScene, SceneManager sceneManager)
+static void HandleSceneSelect(int *activeScene, SceneManager &sceneManager)
 {
+    static int oldActiveScene = 0;
+    if(*activeScene == -1)
+        *activeScene = oldActiveScene;
+    else if(sceneManager.getScenes().at(*activeScene)->getName() != sceneManager.getActiveScene())
+        sceneManager.SetActiveScene(sceneManager.getScenes().at(*activeScene)->getName());
+    oldActiveScene = *activeScene;
+    return;
 }
