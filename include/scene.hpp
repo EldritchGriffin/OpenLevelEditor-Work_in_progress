@@ -16,6 +16,11 @@ public:
     void Update();
     void Draw();
 
+    void addObject();
+
+
+
 private:
     std::string _name;
+    std::vector<Model*> _Objects;
 };

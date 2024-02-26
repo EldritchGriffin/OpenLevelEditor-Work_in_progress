@@ -57,8 +57,7 @@ void drawGui(SceneManager &sceneManager)
     static bool    createSceneTextBoxEditMode = false;
     static char    sceneName[128] = "SceneName";
     char           *sceneList = getSceneNames(sceneManager);
-
-    ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR))); 
+    DrawRectangle(24,24,288,648, GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
     GuiGroupBox((Rectangle){ 24, 24, 288, 56 }, "Project Manager");
     if (GuiButton((Rectangle){ 40, 40, 72, 24 }, "#008#New")) NewProjectButton(); //TODO: create logic for creating a new project.
     if (GuiButton((Rectangle){ 128, 40, 72, 24 }, "#004#Load")) LoadProjectButton(); //TODO: create logic for loading project.
@@ -79,19 +78,54 @@ int main()
 {
     const int screenWidth = 1600;
     const int screenHeight = 900;
+
     SceneManager sceneManager;
     InitWindow(screenWidth, screenHeight, "SimpleLevelEditor");
     SetWindowState(FLAG_WINDOW_RESIZABLE);
     GuiLoadStyle("styles/dark/style_dark.rgs");
+    Camera camera = { 0 };
+    camera.position = (Vector3){ 10.0, 10.0, 10.0 }; // Camera position
+    camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
+    camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
+    camera.fovy = 45.0f;                                // Camera field-of-view Y
+    camera.projection = CAMERA_PERSPECTIVE;
+    // Model loading
+    Model model = LoadModel("Monkey.obj"); // Make sure the model path is correct
+    Vector3 modelPosition = { 0.0f, 0.0f, 0.0f }; // Model position
     SetTargetFPS(60);
     try
     {
+        Vector2 mousepos;
         while (!WindowShouldClose())
         {
+            if(IsKeyDown(KEY_LEFT))
+            {
+                camera.position.x -= 1;
+            }
+            if(IsKeyDown(KEY_RIGHT))
+            {
+                camera.position.x += 1;
+            }
+
+            if(IsFileDropped())
+            {
+                FilePathList files = LoadDroppedFiles();
+                std::cout << "Dropped " <<  files.count << " files" << "\n";
+                std::cout << files.paths[0] << std::endl;
+                //TODO: do some logic to the files here;
+                UnloadModel(model);
+                model = LoadModel(files.paths[0]);
+                UnloadDroppedFiles(files);
+            }
             sceneManager.Update();
             BeginDrawing();
+            ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
+            BeginMode3D(camera);
+            DrawModel(model, modelPosition, 2, BLUE);
+            DrawModelWires(model, modelPosition,2,BLACK);
+            DrawGrid(100,5);
+            EndMode3D();
             drawGui(sceneManager);
-            sceneManager.Draw();
             EndDrawing();
         }
     }
