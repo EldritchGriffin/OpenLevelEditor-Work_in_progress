@@ -7,6 +7,10 @@ Scene::Scene(std::string name)
 
 Scene::~Scene()
 {
+    for (auto object : _Objects)
+    {
+        delete object;
+    }
 }
 
 void Scene::setName(std::string name)
@@ -25,5 +29,14 @@ void Scene::Update()
 
 void Scene::Draw()
 {
-    DrawText(_name.c_str(), 500, 500, 50, BLACK);
+    for (auto object : _Objects)
+    {
+        object->Draw();
+    }
 }
+
+void Scene::addObject(std::string modelPath,Vector3 position, Vector3 rotation, Vector3 scale)
+{
+    _Objects.push_back(new GameObject(modelPath, position, rotation, scale));
+}
+

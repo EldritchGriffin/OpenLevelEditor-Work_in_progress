@@ -81,6 +81,14 @@ void SceneManager::renameActiveScene(const std::string &name)
     activeScene->setName(name);
 }
 
+void SceneManager::addObject(std::string modelPath, Vector3 position, Vector3 rotation, Vector3 scale)
+{
+    if (activeScene)
+    {
+        activeScene->addObject(modelPath, position, rotation, scale);
+    }
+}
+
 void SceneManager::Update()
 {
     if (activeScene)

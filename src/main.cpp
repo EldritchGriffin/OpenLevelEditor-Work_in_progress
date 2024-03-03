@@ -82,48 +82,34 @@ int main()
     SceneManager sceneManager;
     InitWindow(screenWidth, screenHeight, "SimpleLevelEditor");
     SetWindowState(FLAG_WINDOW_RESIZABLE);
-    GuiLoadStyle("styles/dark/style_dark.rgs");
+    GuiLoadStyle("styles/cyber/style_cyber.rgs");
     Camera camera = { 0 };
     camera.position = (Vector3){ 10.0, 10.0, 10.0 }; // Camera position
     camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
-    camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
+    camera.up = (Vector3){ 0.0f, 0.99f, 0.0f };          // Camera up vector (rotation towards target)
     camera.fovy = 45.0f;                                // Camera field-of-view Y
     camera.projection = CAMERA_PERSPECTIVE;
-    // Model loading
-    Model model = LoadModel("Monkey.obj"); // Make sure the model path is correct
-    Vector3 modelPosition = { 0.0f, 0.0f, 0.0f }; // Model position
     SetTargetFPS(60);
     try
     {
-        Vector2 mousepos;
+        DisableCursor();
         while (!WindowShouldClose())
         {
-            if(IsKeyDown(KEY_LEFT))
-            {
-                camera.position.x -= 1;
-            }
-            if(IsKeyDown(KEY_RIGHT))
-            {
-                camera.position.x += 1;
-            }
-
             if(IsFileDropped())
             {
                 FilePathList files = LoadDroppedFiles();
-                std::cout << "Dropped " <<  files.count << " files" << "\n";
-                std::cout << files.paths[0] << std::endl;
-                //TODO: do some logic to the files here;
-                UnloadModel(model);
-                model = LoadModel(files.paths[0]);
+                sceneManager.addObject(files.paths[0], {0,0,0}, {0,0,0}, {1,1,1});
                 UnloadDroppedFiles(files);
             }
+            if(IsKeyPressed(KEY_SPACE))
+                EnableCursor();
+            UpdateCamera(&camera,CAMERA_FREE);
             sceneManager.Update();
             BeginDrawing();
             ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
             BeginMode3D(camera);
-            DrawModel(model, modelPosition, 2, BLUE);
-            DrawModelWires(model, modelPosition,2,BLACK);
-            DrawGrid(100,5);
+            DrawGrid(100,1);
+            sceneManager.Draw();
             EndMode3D();
             drawGui(sceneManager);
             EndDrawing();

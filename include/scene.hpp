@@ -3,6 +3,7 @@
 #include <rlgl.h>
 #include <vector>
 #include <string>
+#include <gameObject.hpp>
 
 class Scene
 {
@@ -16,11 +17,11 @@ public:
     void Update();
     void Draw();
 
-    void addObject();
+    void addObject(std::string modelPath,Vector3 position, Vector3 rotation, Vector3 scale);
 
 
 
 private:
     std::string _name;
-    std::vector<Model*> _Objects;
+    std::vector<GameObject *> _Objects;
 };

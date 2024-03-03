@@ -15,9 +15,12 @@ set(HEADERS
 include/raylib.h
 include/raymath.h
 include/rlgl.h
+include/rlights.h
 include/scene.hpp
 include/sceneManager.hpp
 include/raygui.h
+# include/transform.hpp
+include/gameObject.hpp
 )
 add_compile_options(-Wno-deprecated-declarations)
 
