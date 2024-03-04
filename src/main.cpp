@@ -15,6 +15,71 @@ static void CreateSceneButton(char *sceneName, SceneManager &sceneManager);
 static void RenameSceneButton(char *sceneName, SceneManager &sceneManager);
 static void HandleSceneSelect(int *activeScene, SceneManager &sceneManager);
 
+
+void OrbitAndPanCamera(Camera &camera)
+{
+    static Vector2 previousMousePosition = { 0 };
+    static bool isMiddleMouseButtonPressed = false;
+    static bool isShiftKeyPressed = false;
+
+    if (IsMouseButtonPressed(MOUSE_MIDDLE_BUTTON))
+    {
+        previousMousePosition = GetMousePosition();
+        isMiddleMouseButtonPressed = true;
+    }
+    else if (IsMouseButtonReleased(MOUSE_MIDDLE_BUTTON))
+    {
+        isMiddleMouseButtonPressed = false;
+    }
+
+    if (IsKeyDown(KEY_LEFT_SHIFT))
+    {
+        isShiftKeyPressed = true;
+    }
+    else if (IsKeyUp(KEY_LEFT_SHIFT))
+    {
+        isShiftKeyPressed = false;
+    }
+
+    if (isMiddleMouseButtonPressed)
+    {
+        Vector2 currentMousePosition = GetMousePosition();
+        float deltaX = (currentMousePosition.x - previousMousePosition.x) / 2;
+        float deltaY = (currentMousePosition.y - previousMousePosition.y) / 2 ;
+
+        if (isShiftKeyPressed)
+        {
+            float speed = 0.03f;
+
+            Vector3 forward = Vector3Subtract(camera.target, camera.position);
+            Vector3 right = Vector3CrossProduct(camera.up, forward);
+            right = Vector3Normalize(right);
+            Vector3 up = Vector3CrossProduct(forward, right);
+            up = Vector3Normalize(up);
+            Vector3 pan = Vector3Add(Vector3Scale(right, deltaX * speed), Vector3Scale(up, deltaY * speed));
+            camera.position = Vector3Add(camera.position, pan);
+            camera.target = Vector3Add(camera.target, pan);
+        }
+        else
+        {
+            float speed = 0.01f;
+            float radius = Vector3Distance(camera.position, camera.target);
+            float phi = atan2(camera.position.z - camera.target.z, camera.position.x - camera.target.x);
+            float theta = atan2(sqrt(pow(camera.position.x - camera.target.x, 2) + pow(camera.position.z - camera.target.z, 2)), camera.position.y - camera.target.y);
+            phi += deltaX * speed;
+            theta += deltaY * speed;
+            if (theta < 0.1f) theta = 0.1f;
+            if (theta > PI - 0.1f) theta = PI - 0.1f;
+            camera.position.x = radius * sinf(theta) * cosf(phi) + camera.target.x;
+            camera.position.y = radius * cosf(theta) + camera.target.y;
+            camera.position.z = radius * sinf(theta) * sinf(phi) + camera.target.z;
+
+        }
+
+        previousMousePosition = currentMousePosition;
+    }
+}
+
 std::string styleString(std::string str)
 {
     if(str.size() >= 25)
@@ -85,14 +150,13 @@ int main()
     GuiLoadStyle("styles/cyber/style_cyber.rgs");
     Camera camera = { 0 };
     camera.position = (Vector3){ 10.0, 10.0, 10.0 }; // Camera position
-    camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
+    // camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
     camera.up = (Vector3){ 0.0f, 0.99f, 0.0f };          // Camera up vector (rotation towards target)
     camera.fovy = 45.0f;                                // Camera field-of-view Y
     camera.projection = CAMERA_PERSPECTIVE;
     SetTargetFPS(60);
     try
     {
-        DisableCursor();
         while (!WindowShouldClose())
         {
             if(IsFileDropped())
@@ -101,9 +165,7 @@ int main()
                 sceneManager.addObject(files.paths[0], {0,0,0}, {0,0,0}, {1,1,1});
                 UnloadDroppedFiles(files);
             }
-            if(IsKeyPressed(KEY_SPACE))
-                EnableCursor();
-            UpdateCamera(&camera,CAMERA_FREE);
+            OrbitAndPanCamera(camera);
             sceneManager.Update();
             BeginDrawing();
             ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));

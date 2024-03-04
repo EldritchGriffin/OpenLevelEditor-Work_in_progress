@@ -26,5 +26,6 @@ class GameObject
         void Draw()
         {
             DrawModel(model, {0.0f,0.0f,0.0f}, 1.0f, WHITE);
+            DrawModelWires(model, {0.0f,0.0f,0.0f}, 1.0f, BLACK);
         }
 };
