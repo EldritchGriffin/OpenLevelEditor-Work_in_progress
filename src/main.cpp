@@ -16,6 +16,26 @@ static void RenameSceneButton(char *sceneName, SceneManager &sceneManager);
 static void HandleSceneSelect(int *activeScene, SceneManager &sceneManager);
 
 
+//a function that moves the camera closer or further away from the target and clamp the distance to avoid camera going to the negative side of the target
+void ZoomCamera(Camera &camera)
+{
+    static float cameraDistance = 10.0f;
+    static float minCameraDistance = 1.0f;
+    static float maxCameraDistance = 50.0f;
+    static float scrollSpeed = 0.1f;
+    cameraDistance -= (GetMouseWheelMove() * scrollSpeed);
+    if (cameraDistance < minCameraDistance)
+    {
+        cameraDistance = minCameraDistance;
+    }
+    else if (cameraDistance > maxCameraDistance)
+    {
+        cameraDistance = maxCameraDistance;
+    }
+    Vector3 forward = Vector3Subtract(camera.target, camera.position);
+    forward = Vector3Normalize(forward);
+    camera.position = Vector3Subtract(camera.target, Vector3Scale(forward, cameraDistance));
+}
 void OrbitAndPanCamera(Camera &camera)
 {
     static Vector2 previousMousePosition = { 0 };
@@ -166,6 +186,7 @@ int main()
                 UnloadDroppedFiles(files);
             }
             OrbitAndPanCamera(camera);
+            ZoomCamera(camera);
             sceneManager.Update();
             BeginDrawing();
             ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
