@@ -19,6 +19,7 @@ public:
     void Draw();
     void addObject(std::string modelPath, Vector3 position, Vector3 rotation, Vector3 scale);
     std::vector<Scene *> getScenes();
+    bool isEmpty();
 
 private:
     std::vector<Scene *> scenes;

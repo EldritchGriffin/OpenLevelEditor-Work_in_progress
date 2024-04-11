@@ -1,6 +1,6 @@
 #include <sceneManager.hpp>
 #include <scene.hpp>
-#include <exception>
+#include <stdexcept>
 
 SceneManager::SceneManager()
 {
@@ -112,4 +112,9 @@ void SceneManager::Draw()
 std::vector<Scene *> SceneManager::getScenes()
 {
     return scenes;
+}
+
+bool SceneManager::isEmpty()
+{
+    return scenes.empty();
 }

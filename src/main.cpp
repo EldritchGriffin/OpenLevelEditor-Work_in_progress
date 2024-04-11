@@ -15,14 +15,12 @@ static void CreateSceneButton(char *sceneName, SceneManager &sceneManager);
 static void RenameSceneButton(char *sceneName, SceneManager &sceneManager);
 static void HandleSceneSelect(int *activeScene, SceneManager &sceneManager);
 
-
-//a function that moves the camera closer or further away from the target and clamp the distance to avoid camera going to the negative side of the target
 void ZoomCamera(Camera &camera)
 {
     static float cameraDistance = 10.0f;
     static float minCameraDistance = 1.0f;
     static float maxCameraDistance = 50.0f;
-    static float scrollSpeed = 0.1f;
+    static float scrollSpeed = 0.5f;
     cameraDistance -= (GetMouseWheelMove() * scrollSpeed);
     if (cameraDistance < minCameraDistance)
     {
@@ -99,7 +97,7 @@ void OrbitAndPanCamera(Camera &camera)
         previousMousePosition = currentMousePosition;
     }
 }
-
+//function that trims a string and truncates (...) if the string is too long @param str string to be styled
 std::string styleString(std::string str)
 {
     if(str.size() >= 25)
@@ -161,8 +159,8 @@ void drawGui(SceneManager &sceneManager)
 
 int main()
 {
-    const int screenWidth = 1600;
-    const int screenHeight = 900;
+    const int screenWidth = 800;
+    const int screenHeight = 600;
 
     SceneManager sceneManager;
     InitWindow(screenWidth, screenHeight, "SimpleLevelEditor");
@@ -170,7 +168,6 @@ int main()
     GuiLoadStyle("styles/cyber/style_cyber.rgs");
     Camera camera = { 0 };
     camera.position = (Vector3){ 10.0, 10.0, 10.0 }; // Camera position
-    // camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
     camera.up = (Vector3){ 0.0f, 0.99f, 0.0f };          // Camera up vector (rotation towards target)
     camera.fovy = 45.0f;                                // Camera field-of-view Y
     camera.projection = CAMERA_PERSPECTIVE;
@@ -190,10 +187,17 @@ int main()
             sceneManager.Update();
             BeginDrawing();
             ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
-            BeginMode3D(camera);
-            DrawGrid(100,1);
-            sceneManager.Draw();
-            EndMode3D();
+            if(sceneManager.isEmpty())
+            {
+                DrawText("No active scene", 500, 500, 50, WHITE);
+            }
+            else
+            {
+                BeginMode3D(camera);
+                DrawGrid(100,1);
+                sceneManager.Draw();
+                EndMode3D();
+            }
             drawGui(sceneManager);
             EndDrawing();
         }
