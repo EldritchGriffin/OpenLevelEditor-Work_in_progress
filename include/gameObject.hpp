@@ -8,24 +8,31 @@
 class GameObject
 {
     public:
-        Transform *transform;
         Model model;
+        Vector3 position;
+        Vector3 rotation;
+        Vector3 scale;
 
         GameObject(std::string modelPath ,Vector3 _position, Vector3 _rotation, Vector3 _scale)
         {
             model = LoadModel(modelPath.c_str());
+            position = _position;
+            rotation = _rotation;
+            scale = _scale;
         };
         
         ~GameObject()
         {
             UnloadModel(model);
-            delete transform;
         }
 
-        void Update();
+        void Update()
+        {
+
+        }
         void Draw()
         {
-            DrawModel(model, {0.0f,0.0f,0.0f}, 1.0f, WHITE);
-            DrawModelWires(model, {0.0f,0.0f,0.0f}, 1.0f, BLACK);
+            DrawModel(model, position, 1.0f, WHITE);
+            DrawModelWires(model, position, 1.0f, BLACK);
         }
 };

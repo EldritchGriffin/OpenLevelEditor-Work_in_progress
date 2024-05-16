@@ -89,19 +89,19 @@ void SceneManager::addObject(std::string modelPath, Vector3 position, Vector3 ro
     }
 }
 
-void SceneManager::Update()
+void SceneManager::Update(Camera3D camera)
 {
     if (activeScene)
     {
-        activeScene->Update();
+        activeScene->Update(camera);
     }
 }
 
-void SceneManager::Draw()
+void SceneManager::Draw(Camera3D camera)
 {
     if (activeScene)
     {
-        activeScene->Draw();
+        activeScene->Draw(camera);
     }
     else
     {
