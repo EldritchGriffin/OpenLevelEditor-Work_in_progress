@@ -37,6 +37,7 @@ void ZoomCamera(Camera &camera)
     forward = Vector3Normalize(forward);
     camera.position = Vector3Subtract(camera.target, Vector3Scale(forward, cameraDistance));
 }
+
 void OrbitAndPanCamera(Camera &camera)
 {
     static Vector2 previousMousePosition = {0};
@@ -101,6 +102,7 @@ void OrbitAndPanCamera(Camera &camera)
         previousMousePosition = currentMousePosition;
     }
 }
+
 // function that trims a string and truncates (...) if the string is too long @param str string to be styled
 std::string styleString(std::string str)
 {
@@ -138,9 +140,116 @@ char *getSceneNames(SceneManager &sceneManager)
     return res;
 }
 
+// Custom infinite grid function
+void DrawInfiniteGrid(Camera camera, float spacing = 1.0f, Color color = {100, 100, 100, 255})
+{
+    // Calculate adaptive grid spacing based on camera distance
+    float cameraDistance = Vector3Distance(camera.position, camera.target);
+    float adaptiveSpacing = spacing;
+    
+    // Adjust spacing based on camera distance for better visual experience
+    if (cameraDistance > 50.0f) adaptiveSpacing = spacing * 5.0f;
+    if (cameraDistance > 100.0f) adaptiveSpacing = spacing * 10.0f;
+    if (cameraDistance > 200.0f) adaptiveSpacing = spacing * 20.0f;
+    
+    // Calculate grid bounds based on camera position and view distance
+    float viewDistance = 1000.0f; // Adjust this value to control grid size
+    float gridSize = viewDistance * 2.0f;
+    
+    // Calculate grid center based on camera position
+    Vector3 gridCenter = {camera.target.x, 0, camera.target.z};
+    
+    // Calculate grid bounds
+    float minX = gridCenter.x - gridSize;
+    float maxX = gridCenter.x + gridSize;
+    float minZ = gridCenter.z - gridSize;
+    float maxZ = gridCenter.z + gridSize;
+    
+    // Calculate grid line positions with adaptive spacing
+    int startX = (int)(minX / adaptiveSpacing) * (int)adaptiveSpacing;
+    int endX = (int)(maxX / adaptiveSpacing) * (int)adaptiveSpacing;
+    int startZ = (int)(minZ / adaptiveSpacing) * (int)adaptiveSpacing;
+    int endZ = (int)(maxZ / adaptiveSpacing) * (int)adaptiveSpacing;
+    
+    // Enable line smoothing and anti-aliasing for better appearance
+    rlEnableSmoothLines();
+    rlSetLineWidth(1.0f);
+    
+    // Enable depth test for proper line rendering
+    rlEnableDepthTest();
+    
+    // Draw vertical lines (X direction)
+    for (int x = startX; x <= endX; x += (int)adaptiveSpacing)
+    {
+        // Make center lines more prominent
+        Color lineColor = color;
+        float alpha = 255.0f;
+        
+        if (x == 0)
+        {
+            lineColor = {150, 150, 150, 255}; // Brighter color for center lines
+            rlSetLineWidth(2.0f);
+        }
+        else if (x % ((int)adaptiveSpacing * 5) == 0)
+        {
+            // Make major grid lines slightly more prominent
+            lineColor = {120, 120, 120, 255};
+            rlSetLineWidth(1.5f);
+        }
+        else
+        {
+            // Fade out lines based on distance from center
+            float distanceFromCenter = abs(x);
+            alpha = 255.0f - (distanceFromCenter / gridSize) * 100.0f;
+            if (alpha < 50.0f) alpha = 50.0f;
+            lineColor = {color.r, color.g, color.b, (unsigned char)alpha};
+            rlSetLineWidth(1.0f);
+        }
+        
+        // Use sub-pixel alignment for smoother lines
+        float alignedX = (float)((int)(x * 100.0f)) / 100.0f;
+        DrawLine3D({alignedX, 0, minZ}, {alignedX, 0, maxZ}, lineColor);
+    }
+    
+    // Draw horizontal lines (Z direction)
+    for (int z = startZ; z <= endZ; z += (int)adaptiveSpacing)
+    {
+        // Make center lines more prominent
+        Color lineColor = color;
+        float alpha = 255.0f;
+        
+        if (z == 0)
+        {
+            lineColor = {150, 150, 150, 255}; // Brighter color for center lines
+            rlSetLineWidth(2.0f);
+        }
+        else if (z % ((int)adaptiveSpacing * 5) == 0)
+        {
+            // Make major grid lines slightly more prominent
+            lineColor = {120, 120, 120, 255};
+            rlSetLineWidth(1.5f);
+        }
+        else
+        {
+            // Fade out lines based on distance from center
+            float distanceFromCenter = abs(z);
+            alpha = 255.0f - (distanceFromCenter / gridSize) * 100.0f;
+            if (alpha < 50.0f) alpha = 50.0f;
+            lineColor = {color.r, color.g, color.b, (unsigned char)alpha};
+            rlSetLineWidth(1.0f);
+        }
+        
+        // Use sub-pixel alignment for smoother lines
+        float alignedZ = (float)((int)(z * 100.0f)) / 100.0f;
+        DrawLine3D({minX, 0, alignedZ}, {maxX, 0, alignedZ}, lineColor);
+    }
+    
+    // Disable line smoothing
+    rlDisableSmoothLines();
+}
+
 void drawGui(SceneManager &sceneManager)
 {
-
     static int sceneListScrollIndex = 0;
     static int oldSceneListActive = 0;
     static int sceneListActive = 0;
@@ -211,7 +320,7 @@ int main()
                 rlEnableDepthTest();
                 BeginMode3D(camera);
                 rlSetLineWidth(1.0);
-                DrawGrid(100, 1);
+                DrawInfiniteGrid(camera, 1.0f, {100, 100, 100, 255});
                 sceneManager.Draw(camera);
                 EndMode3D();
             }
